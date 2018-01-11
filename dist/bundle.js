@@ -57,7 +57,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/dist/";
+/******/ 	__webpack_require__.p = "dist/";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 18);
@@ -3303,7 +3303,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_stats_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_dat_gui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_IcosphereGL__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Icosphere__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__rendering_gl_OpenGLRenderer__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Camera__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__globals__ = __webpack_require__(2);
@@ -3323,7 +3323,7 @@ const controls = {
 };
 let icosphere;
 function loadScene() {
-    icosphere = new __WEBPACK_IMPORTED_MODULE_3__geometry_IcosphereGL__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0), 1, controls.tesselations);
+    icosphere = new __WEBPACK_IMPORTED_MODULE_3__geometry_Icosphere__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0), 1, controls.tesselations);
     icosphere.create();
 }
 function main() {
@@ -3340,14 +3340,13 @@ function main() {
     gui.add(controls, 'Load Scene');
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
-    const gl = (function () {
-        let _gl = canvas.getContext('webgl2');
-        if (!_gl) {
-            alert('WebGL 2 not supported!');
-        }
-        Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* setGL */])(_gl);
-        return _gl;
-    })();
+    const gl = canvas.getContext('webgl2');
+    if (!gl) {
+        alert('WebGL 2 not supported!');
+    }
+    // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
+    // Later, we can import `gl` from `globals.ts` to access it
+    Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
     const camera = new __WEBPACK_IMPORTED_MODULE_5__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 5), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
@@ -11880,7 +11879,7 @@ dat.utils.common);
 
 
 
-class IcosphereGL extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* default */] {
+class Icosphere extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* default */] {
     constructor(center, radius, subdivisions) {
         super();
         this.radius = radius;
@@ -11907,9 +11906,8 @@ class IcosphereGL extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["
         const normalByteOffset = vertexByteOffset;
         const positionByteOffset = vertexByteOffset + maxVertexCount * 4 * Float32Array.BYTES_PER_ELEMENT;
         // Create 3-uint buffer views into the backing buffer to represent triangles
-        /* The C++ analogy to this would be something like:
-         * triangles[i] = reinterpret_cast<std::array<unsigned int, 3>*>(&buffer[offset]);
-         */
+        // The C++ analogy to this would be something like:
+        // triangles[i] = reinterpret_cast<std::array<unsigned int, 3>*>(&buffer[offset]);
         let triangles = new Array(20);
         let nextTriangles = new Array();
         for (let i = 0; i < 20; ++i) {
@@ -11954,9 +11952,13 @@ class IcosphereGL extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["
         triangles[17].set([9, 11, 2]);
         triangles[18].set([9, 2, 5]);
         triangles[19].set([7, 2, 11]);
+        // This loop subdivides the icosahedron
         for (let s = 0; s < this.subdivisions; ++s) {
             nextTriangles.length = triangles.length * 4;
             let triangleIdx = 0;
+            // edgeMap maps a pair of vertex indices to a vertex index at their midpoint
+            // The function `mid` will get that midpoint vertex if it has already been created
+            // or it will create the vertex and add it to the map
             let edgeMap = new Map();
             function mid(v0, v1) {
                 let key = [v0, v1].sort().join('_');
@@ -11973,7 +11975,7 @@ class IcosphereGL extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["
                 let v0 = triangles[t][0];
                 let v1 = triangles[t][1];
                 let v2 = triangles[t][2];
-                let v3 = mid(v0, v1);
+                let v3 = mid(v0, v1); // Get or create a vertex between these two vertices
                 let v4 = mid(v1, v2);
                 let v5 = mid(v2, v0);
                 let t0 = nextTriangles[triangleIdx] = new Uint32Array(buffers[1 - b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
@@ -12019,7 +12021,7 @@ class IcosphereGL extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["
     }
 }
 ;
-/* harmony default export */ __webpack_exports__["a"] = (IcosphereGL);
+/* harmony default export */ __webpack_exports__["a"] = (Icosphere);
 
 
 /***/ }),
@@ -12091,6 +12093,7 @@ class Drawable {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(2);
 
 
+// In this file, `gl` is accessible because it is imported above
 class OpenGLRenderer {
     constructor(canvas) {
         this.canvas = canvas;

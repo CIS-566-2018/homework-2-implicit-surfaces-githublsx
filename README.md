@@ -16,7 +16,7 @@ https://github.com/CIS-566-2018/CIS-566-Project-0
 4. Do either of the following (but I highly recommend the first one for reasons I will explain later).
 
     a. Run `npm start` and then go to `localhost:5660` in your web browser
-    
+
     b. Run `npm run build` and then go open `index.html` in your web browser
 
 ## Module Bundling
@@ -25,7 +25,7 @@ One of the most important dependencies of our projects is [Webpack](https://webp
 ## Developing Your Code
 All of the JavaScript code is living inside the `src` directory. The main file that gets executed when you load the page as you may have guessed is `main.ts`. Here, you can make any changes you want, import functions from other files, etc. The reason that I highly suggest you build your project with `npm start` is that doing so will start a process that watches for any changes you make to your code. If it detects anything, it'll automagically rebuild your project and then refresh your browser window for you. Wow. That's cool. If you do it the other way, you'll need to run `npm build` and then refresh your page every time you want to test something.
 
-I would suggest editing your project with Visual Studio Code https://code.visualstudio.com/. Microsoft develops is and Microsoft also develops Typescript so all of the features work nicely together. Sublime Text and installing the Typescript plugins should probably work as well. 
+I would suggest editing your project with Visual Studio Code https://code.visualstudio.com/. Microsoft develops is and Microsoft also develops Typescript so all of the features work nicely together. Sublime Text and installing the Typescript plugins should probably work as well.
 
 ## Assignment Details
 1. Take some time to go through the existing codebase so you can get an understanding of syntax and how the code is architected.
@@ -34,6 +34,7 @@ I would suggest editing your project with Visual Studio Code https://code.visual
 4. Read the documenation for dat.gui below. Update the gui with a parameter to also change uniform color.
 5. Add a toggle to render in wireframe.
 6. Write a custom shader of your choosing and add a toggle to switch shaders. You must use a trig function to modify vertex position or fragment color.
+7. Feel free to update any of the files when writing your code. The implementation of the OpenGLRenderer is currently very simple.
 
 ## Resources
 - Javascript modules https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import

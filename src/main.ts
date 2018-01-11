@@ -36,14 +36,13 @@ function main() {
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-  const gl = (function() {
-    let _gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
-    if (!_gl) {
-      alert('WebGL 2 not supported!');
-    }
-    setGL(_gl);
-    return _gl;
-  })();
+  const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
+  if (!gl) {
+    alert('WebGL 2 not supported!');
+  }
+  // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
+  // Later, we can import `gl` from `globals.ts` to access it
+  setGL(gl);
 
   // Initial call to load scene
   loadScene();

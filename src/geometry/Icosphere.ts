@@ -10,7 +10,7 @@ class Icosphere extends Drawable {
   center: vec4;
 
   constructor(center: vec3, public radius: number, public subdivisions: number) {
-    super();
+    super(); // Call the constructor of the super class. This is required.
     this.center = vec4.fromValues(center[0], center[1], center[2], 1);
   }
 
@@ -42,9 +42,8 @@ class Icosphere extends Drawable {
     const positionByteOffset = vertexByteOffset + maxVertexCount * 4 * Float32Array.BYTES_PER_ELEMENT;
 
     // Create 3-uint buffer views into the backing buffer to represent triangles
-    /* The C++ analogy to this would be something like:
-     * triangles[i] = reinterpret_cast<std::array<unsigned int, 3>*>(&buffer[offset]);
-     */
+    // The C++ analogy to this would be something like:
+    // triangles[i] = reinterpret_cast<std::array<unsigned int, 3>*>(&buffer[offset]);
     let triangles: Array<Uint32Array> = new Array(20);
     let nextTriangles: Array<Uint32Array> = new Array();
     for (let i = 0; i < 20; ++i) {
@@ -93,10 +92,14 @@ class Icosphere extends Drawable {
     triangles[18].set([ 9,2,5 ]);
     triangles[19].set([ 7,2,11 ]);
 
+    // This loop subdivides the icosahedron
     for (let s = 0; s < this.subdivisions; ++s) {
       nextTriangles.length = triangles.length * 4;
       let triangleIdx = 0;
 
+      // edgeMap maps a pair of vertex indices to a vertex index at their midpoint
+      // The function `mid` will get that midpoint vertex if it has already been created
+      // or it will create the vertex and add it to the map
       let edgeMap: Map<string, number> = new Map();
       function mid(v0: number, v1: number): number {
         let key = [v0, v1].sort().join('_');
@@ -114,7 +117,7 @@ class Icosphere extends Drawable {
         let v0 = triangles[t][0];
         let v1 = triangles[t][1];
         let v2 = triangles[t][2];
-        let v3 = mid(v0, v1);
+        let v3 = mid(v0, v1); // Get or create a vertex between these two vertices
         let v4 = mid(v1, v2);
         let v5 = mid(v2, v0);
 
