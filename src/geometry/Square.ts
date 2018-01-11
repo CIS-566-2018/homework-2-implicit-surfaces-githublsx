@@ -44,4 +44,4 @@ class Square extends Drawable {
   }
 };
 
-export default Icosphere;
+export default Square;
