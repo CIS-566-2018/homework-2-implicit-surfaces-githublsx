@@ -21,7 +21,7 @@ let square: Square;
 function loadScene() {
   icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
   icosphere.create();
-  square = new Icosphere(vec3.fromValues(0, 0, 0));
+  square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
 }
 
