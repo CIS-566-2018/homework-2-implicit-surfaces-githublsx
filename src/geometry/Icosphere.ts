@@ -2,7 +2,7 @@ import {vec3, vec4} from 'gl-matrix';
 import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 
-class IcosphereGL extends Drawable {
+class Icosphere extends Drawable {
   buffer: ArrayBuffer;
   indices: Uint32Array;
   positions: Float32Array;
@@ -171,4 +171,4 @@ class IcosphereGL extends Drawable {
   }
 };
 
-export default IcosphereGL;
+export default Icosphere;
