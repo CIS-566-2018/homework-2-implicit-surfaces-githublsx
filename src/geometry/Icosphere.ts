@@ -94,6 +94,7 @@ class Icosphere extends Drawable {
 
     // This loop subdivides the icosahedron
     for (let s = 0; s < this.subdivisions; ++s) {
+      b = 1 - b;
       nextTriangles.length = triangles.length * 4;
       let triangleIdx = 0;
 
@@ -121,10 +122,10 @@ class Icosphere extends Drawable {
         let v4 = mid(v1, v2);
         let v5 = mid(v2, v0);
 
-        let t0 = nextTriangles[triangleIdx] = new Uint32Array(buffers[1-b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
-        let t1 = nextTriangles[triangleIdx] = new Uint32Array(buffers[1-b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
-        let t2 = nextTriangles[triangleIdx] = new Uint32Array(buffers[1-b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
-        let t3 = nextTriangles[triangleIdx] = new Uint32Array(buffers[1-b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
+        let t0 = nextTriangles[triangleIdx] = new Uint32Array(buffers[b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
+        let t1 = nextTriangles[triangleIdx] = new Uint32Array(buffers[b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
+        let t2 = nextTriangles[triangleIdx] = new Uint32Array(buffers[b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
+        let t3 = nextTriangles[triangleIdx] = new Uint32Array(buffers[b], indexByteOffset + (triangleIdx++) * 3 * Uint32Array.BYTES_PER_ELEMENT, 3);
 
         let triangleOffset = nextTriangles.length;
         t0.set([v0, v3, v5]);
@@ -134,14 +135,15 @@ class Icosphere extends Drawable {
       }
 
       // swap buffers
-      [triangles, nextTriangles] = [nextTriangles, triangles];
-      b = 1 - b;
+      let temp = triangles;
+      triangles = nextTriangles;
+      nextTriangles = temp;
     }
 
-    if (b == 0) {
+    if (b === 1) {
       // if indices did not end up in buffer0, copy them there now
-      let temp0 = new Uint32Array(buffers[0], 0, triangles.length);
-      let temp1 = new Uint32Array(buffers[1], 0, triangles.length);
+      let temp0 = new Uint32Array(buffer0, 0, 3 * triangles.length);
+      let temp1 = new Uint32Array(buffer1, 0, 3 * triangles.length);
       temp0.set(temp1);
     }
 
@@ -151,7 +153,7 @@ class Icosphere extends Drawable {
       vec4.scaleAndAdd(pos, this.center, vertices[i], this.radius);
     }
 
-    this.buffer = buffers[0];
+    this.buffer = buffer0;
     this.indices = new Uint32Array(this.buffer, indexByteOffset, triangles.length * 3);
     this.normals = new Float32Array(this.buffer, normalByteOffset, vertices.length * 4);
     this.positions = new Float32Array(this.buffer, positionByteOffset, vertices.length * 4);
