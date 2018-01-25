@@ -1,9 +1,9 @@
-# CIS-566-Project-0
-https://github.com/CIS-566-2018/CIS-566-Project-0
+# CIS-566-Project-2
+https://github.com/CIS-566-2018/homework-2-ray-marching-implicit-surfaces
 
 ## Objective
-- Check that the tools and build configuration we will be using for the class works.
-- Start learning Typescript and WebGL2
+- Gain more experience with Typescript, WebGL2, GLSL Shader writing, and raymarching
+- Experiment with procedural modeling and animation of scenes
 
 ## Running the Code
 
@@ -26,19 +26,11 @@ All of the JavaScript code is living inside the `src` directory. The main file t
 We would suggest editing your project with Visual Studio Code https://code.visualstudio.com/. Microsoft develops it and Microsoft also develops Typescript so all of the features work nicely together. Sublime Text and installing the Typescript plugins should probably work as well.
 
 ## Assignment Details
-1. Take some time to go through the existing codebase so you can get an understanding of syntax and how the code is architected. Much of the code is designed to mirror the class structures used in CIS 460's OpenGL assignments, so it should hopefully be somewhat familiar.
-2. Take a look at the resources linked in the section below. Definitely read about Javascript modules and Typescript. The other links provide documentation for classes used in the code.
-3. Add a `Cube` class that inherits from `Drawable` and at the very least implement a constructor and its `create` function. Then, add a `Cube` instance to the scene to be rendered.
-4. Read the documentation for dat.GUI below. Update the existing GUI in `main.ts` with a parameter to alter the color passed to `u_Color` in the Lambert shader.
-5. Write a custom shader of your choosing and add a GUI element that allows the user to switch shaders. Your custom shader must use a trig function to modify vertex position or fragment color non-uniformly. If your custom shader is particularly interesting, you'll earn some bonus points.
-6. Feel free to update any of the files when writing your code. The implementation of the `OpenGLRenderer` is currently very simple.
+
+1. Brief explanation of code architecture here
+2. You must make a raymarched scene that incorporates smooth blending of surfaces, repetition of shapes, and at least two other transformations. You've seen lecture slides and demos and have a wealth of resources at your disposal - push your limits! This course is as artistic as it is technical.
+3. Create and animate a scene! Using SDFs creatively, you must model and animate a "cool" scene. You can make whatever you want of course, but if you just can't think of something, then our suggestion is to make something mechanical like [this](https://www.shadertoy.com/view/XlfGzH). Additionally, we (Dan and Joe) like using [GraphToy](http://www.iquilezles.org/apps/graphtoy/) for easy editing and creation of custom functions for modeling and animating.
+4. You must give your scene at least one kind of interesting shading model, and we're not talking Lame-bert or Blinn-Phong...there are a ton of things you could do! If you just can't think of something, try specular reflection/transmission...or a [real-time subsurface scattering approximation](https://colinbarrebrisebois.com/2011/03/07/gdc-2011-approximating-translucency-for-a-fast-cheap-and-convincing-subsurface-scattering-look/).
 
 ## Resources
-- Javascript modules https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
-- Typescript https://www.typescriptlang.org/docs/home.html
-- dat.gui https://workshop.chromeexperiments.com/examples/gui/
-- glMatrix http://glmatrix.net/docs/
-- WebGL
-  - Interfaces https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
-  - Types https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types
-  - Constants https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+- [Lecture slides](https://docs.google.com/presentation/d/1W5KWvkT1tscRG8x5tSfKXBRx9EGTZ-jVsOhIlfhJQLQ/edit?usp=sharing) (see the last two slides)
