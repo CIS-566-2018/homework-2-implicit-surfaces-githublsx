@@ -1,9 +1,7 @@
 import {vec3} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
-import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
-import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
@@ -11,19 +9,10 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  tesselations: 5,
-  'Load Scene': loadScene, // A function pointer, essentially
+  // TODO: add any controls you want
 };
 
-let icosphere: Icosphere;
-let square: Square;
-
-function loadScene() {
-  icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
-  icosphere.create();
-  square = new Square(vec3.fromValues(0, 0, 0));
-  square.create();
-}
+let screenQuad: Square;
 
 function main() {
   // Initial display for framerate
@@ -34,13 +23,18 @@ function main() {
   stats.domElement.style.top = '0px';
   document.body.appendChild(stats.domElement);
 
-  // Add controls to the gui
+  // TODO: add any controls you need to the gui
   const gui = new DAT.GUI();
-  gui.add(controls, 'tesselations', 0, 8).step(1);
-  gui.add(controls, 'Load Scene');
+  // E.G. gui.add(controls, 'tesselations', 0, 8).step(1);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
+
+  function setSize(width: number, height: number) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+
   const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
   if (!gl) {
     alert('WebGL 2 not supported!');
@@ -49,30 +43,35 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-  // Initial call to load scene
-  loadScene();
+  screenQuad = new Square(vec3.fromValues(0, 0, 0));
+  screenQuad.create();
 
   const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
 
-  const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0.0, 0.0, 0.0, 1);
+  gl.disable(gl.DEPTH_TEST);
 
-  const lambert = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
+  const raymarchShader = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/screenspace-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/raymarch-frag.glsl')),
   ]);
 
   // This function will be called every frame
   function tick() {
     camera.update();
     stats.begin();
+
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-    renderer.clear();
-    renderer.render(camera, lambert, [
-      // icosphere,
-      square,
-    ]);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // TODO: get / calculate relevant uniforms to send to shader here
+    // TODO: send uniforms to shader
+
+    // March!
+    raymarchShader.draw(screenQuad);
+
+    // TODO: more shaders to layer / process the first one? (either via framebuffers or blending)
+
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
@@ -80,12 +79,12 @@ function main() {
   }
 
   window.addEventListener('resize', function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
   }, false);
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
   camera.updateProjectionMatrix();
 
