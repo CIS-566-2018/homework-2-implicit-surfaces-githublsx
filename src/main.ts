@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import {vec3, vec4, mat4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -17,14 +17,14 @@ let screenQuad: Square;
 function main() {
   // Initial display for framerate
   const stats = Stats();
-  stats.setMode(0);
+  stats.setMode(1);
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
-  document.body.appendChild(stats.domElement);
+  //document.body.appendChild(stats.domElement);
 
   // TODO: add any controls you need to the gui
-  const gui = new DAT.GUI();
+  // const gui = new DAT.GUI();
   // E.G. gui.add(controls, 'tesselations', 0, 8).step(1);
 
   // get canvas and webgl context
@@ -46,7 +46,11 @@ function main() {
   screenQuad = new Square(vec3.fromValues(0, 0, 0));
   screenQuad.create();
 
-  const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 0, 5), vec3.fromValues(0, 0, 0)); //end transfomrm
+  //const camera = new Camera(vec3.fromValues(0, 0, 8.2), vec3.fromValues(0, 0, 0)); //start to transfomrm
+  //const camera = new Camera(vec3.fromValues(0, 0, 0.5), vec3.fromValues(0, 0, 0)); // end transform
+  //const camera = new Camera(vec3.fromValues(0, 0, 0.62), vec3.fromValues(0, 0, 0)); // start to transform
+  //const camera = new Camera(vec3.fromValues(0, 0, 0.83), vec3.fromValues(0, 0, 0)); // old
 
   gl.clearColor(0.0, 0.0, 0.0, 1);
   gl.disable(gl.DEPTH_TEST);
@@ -55,12 +59,25 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/screenspace-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/raymarch-frag.glsl')),
   ]);
-
+  var lastUpdate = Date.now();
   // This function will be called every frame
   function tick() {
     camera.update();
-    stats.begin();
 
+    let model = mat4.create();
+    let viewProj = mat4.create();
+    mat4.identity(model);
+    mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
+    raymarchShader.setModelMatrix(camera.viewMatrix);
+    raymarchShader.setViewProjMatrix(viewProj);
+
+    stats.begin();
+    var now = Date.now();
+    var dt = now - lastUpdate;
+    raymarchShader.setTime(dt/1000);
+
+    raymarchShader.setCamerapos(vec4.fromValues(camera.controls.eye[0],camera.controls.eye[1], camera.controls.eye[2], 1.0));
+    raymarchShader.setTargetpos(vec4.fromValues(camera.controls.center[0], camera.controls.center[1], camera.controls.center[2], 1.0));
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -69,6 +86,7 @@ function main() {
 
     // March!
     raymarchShader.draw(screenQuad);
+    
 
     // TODO: more shaders to layer / process the first one? (either via framebuffers or blending)
 
@@ -82,11 +100,13 @@ function main() {
     setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
+    raymarchShader.setResolution(vec4.fromValues(window.innerWidth, window.innerHeight, 0.0, 0.0));
   }, false);
 
   setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
   camera.updateProjectionMatrix();
+  raymarchShader.setResolution(vec4.fromValues(window.innerWidth, window.innerHeight, 0.0, 0.0));
 
   // Start the render loop
   tick();
